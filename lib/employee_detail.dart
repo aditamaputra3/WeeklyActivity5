@@ -103,9 +103,9 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
           Padding(
             padding: const EdgeInsets.only(right: 20.0),
             child: GestureDetector(
-              onTap: () {
+              //onTap: () {
                 //pickImage(ImageSource.camera, args[0]);
-              },
+              //},
               child: const Icon(
                 Icons.camera_alt,
                 size: 26.0,
@@ -116,10 +116,10 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
             padding: const EdgeInsets.only(right: 20.0),
             child: GestureDetector(
               onTap: () {
-                // Navigator.pushNamed(context, 'employee_form_edit',
-                //     arguments: [employee[0].id]);
-               // Navigator.pushNamed(context, 'employee_form_edit',
-                //    arguments: [employee[0].id]).then(reloadDataEmployee);
+                 //Navigator.pushNamed(context, 'employee_form_edit',
+                     //arguments: [employee[0].id]);
+               Navigator.pushNamed(context, 'employee_form_edit',
+              arguments: [employee[0].id]).then(reloadDataEmployee);
               },
               child: const Icon(
                 Icons.edit,

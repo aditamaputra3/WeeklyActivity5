@@ -169,7 +169,7 @@ class _EmployeeFormAddState extends State<EmployeeFormAdd>{
                     }
                   }
                 },
-                child: const Text("Submit"),
+                child: const Text("SUBMIT"),
                 ),
               ))
             ],
