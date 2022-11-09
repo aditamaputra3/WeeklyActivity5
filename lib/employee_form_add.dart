@@ -1,5 +1,3 @@
-
-
 import 'dart:convert';
 import 'package:intl/intl.dart';
 
@@ -9,15 +7,16 @@ import 'package:office_crud/employee_model.dart';
 
 import 'restapi.dart';
 
-class EmployeeFormAdd extends StatefulWidget{
-  const EmployeeFormAdd({Key? key}) : super(key: key);
+
+
+class EmployeeFormAdd extends StatefulWidget {
+  const EmployeeFormAdd({super.key});
 
   @override
-
   _EmployeeFormAddState createState() => _EmployeeFormAddState();
 }
 
-class _EmployeeFormAddState extends State<EmployeeFormAdd>{
+class _EmployeeFormAddState extends State<EmployeeFormAdd> {
   final name = TextEditingController();
   final phone = TextEditingController();
   final email = TextEditingController();
@@ -31,55 +30,53 @@ class _EmployeeFormAddState extends State<EmployeeFormAdd>{
   DataService ds = DataService();
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: const Color.fromARGB(255, 255, 255, 255),
+      backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: false,
       appBar: AppBar(
         title: const Text("Employee Form Add"),
         backgroundColor: Colors.indigo,
       ),
-      body: Column(
+      body: SingleChildScrollView(
+      child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-          //name
+          // Name
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
               controller: name,
               keyboardType: TextInputType.text,
               decoration: const InputDecoration(
-                border: OutlineInputBorder(),
-                hintText: 'Full Name',
-              ),
+                  border: OutlineInputBorder(), hintText: 'Full Name'),
             ),
           ),
-          //Gender
+          // Gender
           Padding(
-            padding:
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: DropdownButtonFormField(
-              decoration: const InputDecoration(
-                filled: false,
-                border: InputBorder.none,
-              ),
-              value: gender,
-              onChanged: (String? newValue){
-                if(kDebugMode){
-                  print(newValue);
-                }
+                decoration: const InputDecoration(
+                    filled: false, border: InputBorder.none),
+                value: gender,
+                onChanged: (String? newValue) {
+                  if (kDebugMode) {
+                    print(newValue);
+                  }
 
-                setState(() {
-                  gender = newValue!;
-                });
-              },
-              items: <String>['Male', 'Female']
-                  .map<DropdownMenuItem<String>>((String value){
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList())),
-          //Birthday
+                  setState(() {
+                    gender = newValue!;
+                  });
+                },
+                items: <String>['Male', 'Female']
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList()),
+          ),
+          // Birthday
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
@@ -90,13 +87,13 @@ class _EmployeeFormAddState extends State<EmployeeFormAdd>{
                 border: OutlineInputBorder(),
                 hintText: "Birthday",
               ),
-              onTap: (){
+              onTap: () {
                 showDialogPicker(context);
               },
             ),
           ),
-          //phone
-           Padding(
+          // Phone
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
               controller: phone,
@@ -108,8 +105,8 @@ class _EmployeeFormAddState extends State<EmployeeFormAdd>{
               ),
             ),
           ),
-          //Email
-           Padding(
+          // Email
+          Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
               controller: email,
@@ -117,91 +114,90 @@ class _EmployeeFormAddState extends State<EmployeeFormAdd>{
               maxLines: 1,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: "Email adress",
+                hintText: "Email Address",
               ),
             ),
           ),
-          //adress
+          // Address
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
               controller: adress,
+              keyboardType: TextInputType.multiline,
               maxLines: 4,
               minLines: 3,
-              keyboardType: TextInputType.multiline,
               decoration: const InputDecoration(
                 border: OutlineInputBorder(),
-                hintText: "adress",
+                hintText: "Address",
               ),
             ),
           ),
-          //submit Button
+          // Submit Button
           Padding(
-            padding: 
-                const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: SizedBox(
               width: double.infinity,
               height: 45,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.lightGreen, elevation: 0),
+                    backgroundColor: Colors.lightGreen, elevation: 0),
                 onPressed: () async {
                   List response = jsonDecode(await ds.insertEmployee(
-                    "63476ceb99b6c11c094bd5ed", 
-                    name.text, 
-                    phone.text, 
-                    email.text, 
-                    adress.text, 
-                    gender, 
-                    birthday.text, 
-                    "-"));
+                      "63476ceb99b6c11c094bd5ed",
+                      name.text,
+                      phone.text,
+                      email.text,
+                      adress.text,
+                      gender,
+                      birthday.text,
+                      "-"));
 
+                  List<EmployeeModel> employee =
+                      response.map((e) => EmployeeModel.fromJson(e)).toList();
 
-                   List<EmployeeModel> employee = response
-                        .map((e) => EmployeeModel.fromJson(e))
-                        .toList();
-
-                  if (employee.length == 1){
+                  if (employee.length == 1) {
                     Navigator.pop(context, true);
                   } else {
-                    if(kDebugMode){
+                    if (kDebugMode) {
                       print(response);
                     }
                   }
                 },
                 child: const Text("SUBMIT"),
-                ),
-              ))
-            ],
-          ));
-        }
+              ),
+            ),
+          ),
+        ],
+      ),
+    ));
+  }
 
-  //Date Picker
-  void showDialogPicker(BuildContext context){
+  // Date Picker
+  void showDialogPicker(BuildContext context) {
     selectedDate = showDatePicker(
       context: context,
       initialDate: DateTime.now(),
       firstDate: DateTime(1980),
       lastDate: DateTime.now(),
-      builder: (BuildContext context, Widget? child){
+      builder: (BuildContext context, Widget? child) {
         return Theme(
-          data: ThemeData.light(), 
+          data: ThemeData.light(),
           child: child!,
-          );
-        },
-      );
+        );
+      },
+    );
 
-    selectedDate.then((value){
-      setState((){
+    selectedDate.then((value) {
+      setState(() {
         if (value == null) return;
 
-        final DateFormat formatter = DateFormat('dd-MMM-yyyy');
+        final DateFormat formatter = DateFormat.yMMMMd('en_US');
         final String formattedDate = formatter.format(value);
         birthday.text = formattedDate;
       });
-    }, onError: (error) {
-      if (kDebugMode){
-        print(error);
+    }, onError: (err) {
+      if (kDebugMode) {
+        print(err);
       }
     });
   }

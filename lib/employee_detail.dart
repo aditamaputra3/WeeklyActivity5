@@ -1,14 +1,16 @@
 // ignore_for_file: library_private_types_in_public_api,
-// ignore_for_file: use_build_context_synchronously
+// ignore_for_file: use_build_context_synchronously,
+// ignore_for_file: prefer_interpolation_to_compose_strings
 
 import 'dart:convert';
 import 'dart:async';
 import 'dart:io';
 
-//import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-//import 'package:flutter/services.dart';
-//import 'package:image_picker/image_picker.dart';
+import 'package:flutter/services.dart';
+import 'package:file_picker/file_picker.dart';
+
 import 'package:office_crud/employee_model.dart';
 import 'restapi.dart';
 
@@ -45,53 +47,42 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
   File? image;
   String? imageProfpic;
 
-  /*Future pickImage(ImageSource source, String id) async {
+  Future pickImage(String id) async {
     try {
-      final image = await ImagePicker().pickImage(source: source);
-      if (image == null) {
-        if (kDebugMode) {
-          print('no image');
-        }
-      } else {
-        if (kDebugMode) {
-          print('have image');
-        }
-        final upload = jsonDecode(await ds.upload(
-                '6115e1be32c2a05a0b647a5f', 'office', File(image.path)))
-            as Map<String, dynamic>;
-        if (kDebugMode) {
-          print(upload['file_name']);
-        }
+      var picked = await FilePicker.platform.pickFiles();
 
-        // bool updateProfpic = await requester.updateId(
-        //     'profpic',
-        //     upload['file_name'],
-        //     '52f866f58d909e13236110e5',
-        //     'crud',
-        //     'employee',
-        //     '5ab617c01f6d047f0dd36d55',
-        //     id);
+      if (picked != null) {
+        var response = await ds.upload('63476b1799b6c11c094bd504', 'office',
+            picked.files.first.bytes!, picked.files.first.extension.toString());
 
-        // if (updateProfpic) {
-        //   if (kDebugMode) {
-        //     print('Data Updated');
+        var file = jsonDecode(response);
 
-        //     setState(() {
-        //       // imageProfpic = 'https://file.247go.app/d226fd9f5fcf8bc3cbdff22e2bd79efe/' + upload['file_name'];
-        //     });
-        //   }
-        // }
+        var updateStatus = await ds.updateId(
+            'prefix',
+            file['file_name'],
+            '63476b1799b6c11c094bd504',
+            'office',
+            'employee',
+            '63476ceb99b6c11c094bd5ed',
+            id);
+
+        // Not Good
+        setState(() {});
       }
     } on PlatformException catch (e) {
       if (kDebugMode) {
         print(e);
       }
     }
-  }*/
+  }
 
   @override
   Widget build(BuildContext context) {
     final args = ModalRoute.of(context)?.settings.arguments as List<String>;
+
+    if (kDebugMode) {
+      print(args[0]);
+    }
 
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
@@ -103,9 +94,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
           Padding(
             padding: const EdgeInsets.only(right: 20.0),
             child: GestureDetector(
-              //onTap: () {
-                //pickImage(ImageSource.camera, args[0]);
-              //},
+              onTap: () => pickImage(args[0]),
               child: const Icon(
                 Icons.camera_alt,
                 size: 26.0,
@@ -116,10 +105,11 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
             padding: const EdgeInsets.only(right: 20.0),
             child: GestureDetector(
               onTap: () {
-                 //Navigator.pushNamed(context, 'employee_form_edit',
-                     //arguments: [employee[0].id]);
-               Navigator.pushNamed(context, 'employee_form_edit',
-              arguments: [employee[0].id]).then(reloadDataEmployee);
+                // Navigator.pushNamed(context, 'employee_form_edit',
+                //     arguments: [employee[0].id]);
+
+                Navigator.pushNamed(context, 'employee_form_edit',
+                    arguments: [employee[0].id]).then(reloadDataEmployee);
               },
               child: const Icon(
                 Icons.edit,
@@ -206,25 +196,57 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                         width: MediaQuery.of(context).size.width,
                         height: MediaQuery.of(context).size.height * 0.40,
                         child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          crossAxisAlignment: CrossAxisAlignment.center,
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            const SizedBox(height: 20),
-                            const SizedBox(height: 20),
-                            const Icon(
-                              Icons.person,
-                              color: Colors.white,
-                              size: 130,
+                            Stack(
+                              alignment: Alignment.bottomRight,
+                              children: [
+                                employee[0].prefix == '-'
+                                    ? const Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Icon(
+                                          Icons.person,
+                                          color: Colors.white,
+                                          size: 130,
+                                        ),
+                                      )
+                                    : Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: SizedBox(
+                                            width: 130,
+                                            height: 130,
+                                            child: Image.network(
+                                                "https://file.etter.cloud/d226fd9f5fcf8bc3cbdff22e2bd79efe/" +
+                                                    employee[0].prefix)),
+                                      ),
+                                InkWell(
+                                    onTap: () => pickImage(args[0]),
+                                    child: Align(
+                                        alignment: Alignment.bottomCenter,
+                                        child: Container(
+                                            height: 30.00,
+                                            width: 30.00,
+                                            margin: const EdgeInsets.only(
+                                              left: 183.00,
+                                              top: 10.00,
+                                              right: 113.00,
+                                            ),
+                                            decoration: BoxDecoration(
+                                              color: Colors.white70,
+                                              borderRadius:
+                                                  BorderRadius.circular(
+                                                5.00,
+                                              ),
+                                            ),
+                                            child: const Icon(
+                                              Icons.camera_alt_outlined,
+                                              size: 20,
+                                              color: Colors.black,
+                                            )))),
+                              ],
                             ),
-                            // IconButton(
-                            //   onPressed: () {
-                            //     Navigator.pop(context);
-                            //     pickImage(ImageSource.camera, args[0]);
-                            //   },
-                            //   icon: const Icon(
-                            //     Icons.person,
-                            //     color: Colors.white,
-                            //     size: 130,
-                            //   ),
-                            // ),
                             Row(
                               mainAxisAlignment: MainAxisAlignment.center,
                               children: <Widget>[
@@ -310,7 +332,7 @@ class _EmployeeDetailState extends State<EmployeeDetail> {
                         child: ListTile(
                           title: Text(employee[0].adress),
                           subtitle: const Text(
-                            "Adress",
+                            "Address",
                             style: TextStyle(color: Colors.black54),
                           ),
                           leading: IconButton(

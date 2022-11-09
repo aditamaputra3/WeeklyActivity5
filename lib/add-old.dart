@@ -1,6 +1,4 @@
-//
-//
-//
+
 
 import 'dart:convert';
 import 'package:intl/intl.dart';
@@ -11,69 +9,39 @@ import 'package:office_crud/employee_model.dart';
 
 import 'restapi.dart';
 
-bool i = true;
-class EmployeeFormEdit extends StatefulWidget{
-  const EmployeeFormEdit({Key? key}) : super(key: key);
+class EmployeeFormAdd extends StatefulWidget{
+  const EmployeeFormAdd({Key? key}) : super(key: key);
 
   @override
 
-  _EmployeeFormEditState createState() => _EmployeeFormEditState();
+  _EmployeeFormAddState createState() => _EmployeeFormAddState();
 }
 
-class _EmployeeFormEditState extends State<EmployeeFormEdit>{
-  DataService ds = DataService();
-
+class _EmployeeFormAddState extends State<EmployeeFormAdd>{
   final name = TextEditingController();
   final phone = TextEditingController();
   final email = TextEditingController();
   final birthday = TextEditingController();
   final adress = TextEditingController();
   String gender = 'Male';
-  String update_id = '';
 
   late Future<DateTime?> selectedDate;
   String date = "-";
 
-  //Emp DAta
-  List<EmployeeModel> employee = [];
-
-  selectIdEmployee(String id) async{
-    List data = [];
-    data  = jsonDecode(await ds.selectId('63476b1799b6c11c094bd504', 'office',
-          'employee', '63476ceb99b6c11c094bd5ed', id));
-    employee = data.map((e) => EmployeeModel.fromJson(e)).toList();
-
-    name.text = employee[0].name;
-    birthday.text = employee[0].birthday;
-    phone.text = employee[0].phone;
-    email.text = employee[0].email;
-    adress.text = employee[0].adress;
-    gender = employee[0].gender;
-    update_id = employee[0].id;
-  }
-
-  tampilData() async{
-    final args = ModalRoute.of(context)?.settings.arguments as List<String>;
-    selectIdEmployee(args[0]);
-  }
+  DataService ds = DataService();
 
   @override
   Widget build(BuildContext context){
-    
-    if(i == true){
-      tampilData();
-    }
-
     return Scaffold(
       backgroundColor: const Color.fromARGB(255, 255, 255, 255),
       appBar: AppBar(
-        title: const Text("Employee Form Edit"),
+        title: const Text("Employee Form Add"),
         backgroundColor: Colors.indigo,
       ),
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: <Widget>[
-           //name
+          //name
           Padding(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: TextField(
@@ -122,9 +90,8 @@ class _EmployeeFormEditState extends State<EmployeeFormEdit>{
                 border: OutlineInputBorder(),
                 hintText: "Birthday",
               ),
-              onTap:() async{
+              onTap: (){
                 showDialogPicker(context);
-                i = true;
               },
             ),
           ),
@@ -170,7 +137,8 @@ class _EmployeeFormEditState extends State<EmployeeFormEdit>{
           ),
           //submit Button
           Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+            padding: 
+                const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
             child: SizedBox(
               width: double.infinity,
               height: 45,
@@ -178,27 +146,35 @@ class _EmployeeFormEditState extends State<EmployeeFormEdit>{
                 style: ElevatedButton.styleFrom(
                   backgroundColor: Colors.lightGreen, elevation: 0),
                 onPressed: () async {
-                  bool updateStatus = await ds.updateId(
-                    'name~email~phone~adress~gender~birthday',
-                    name.text + '~' + email.text + '~' + phone.text + '~' + adress.text + '~' + gender + '~' + birthday.text,
-                    '63476b1799b6c11c094bd504',
-                    'office',
-                    'employee',
-                    '63476ceb99b6c11c094bd5ed', 
-                    update_id);
-                  
-                  if (updateStatus){
+                  List response = jsonDecode(await ds.insertEmployee(
+                    "63476ceb99b6c11c094bd5ed", 
+                    name.text, 
+                    phone.text, 
+                    email.text, 
+                    adress.text, 
+                    gender, 
+                    birthday.text, 
+                    "-"));
+
+
+                   List<EmployeeModel> employee = response
+                        .map((e) => EmployeeModel.fromJson(e))
+                        .toList();
+
+                  if (employee.length == 1){
                     Navigator.pop(context, true);
+                  } else {
+                    if(kDebugMode){
+                      print(response);
+                    }
                   }
-                  i = false;
                 },
-                child: const Text("Update"),
-              ),
-            ))
-          ],
-        ),
-      );
-    }
+                child: const Text("SUBMIT"),
+                ),
+              ))
+            ],
+          ));
+        }
 
   //Date Picker
   void showDialogPicker(BuildContext context){

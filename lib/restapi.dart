@@ -1,5 +1,4 @@
-// ignore_for_file: non_constant_identifier_names
-
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 
 class DataService {
@@ -11,7 +10,7 @@ class DataService {
             'token': '63476b1799b6c11c094bd504',
             'project': 'office',
             'collection': 'employee',
-            'appid':'63476ceb99b6c11c094bd5ed',
+            'appid': appid,
             'name': name,
             'phone': phone,
             'email': email,
@@ -22,12 +21,14 @@ class DataService {
          });
 
          if (response.statusCode == 200) {
-            return true;
+            return response.body;
          } else {
-            return false;
+            // Return an empty array
+            return '[]';
          }
       } catch (e) {
-         return false;
+         // Print error here
+         return '[]';
       }
    }
 
@@ -771,4 +772,37 @@ class DataService {
          return '[]';
       }
    }
+   Future upload(
+      String token, String project, List<int> file, String ext) async {
+    try {
+      String uri = 'https://io.etter.cloud/v4/upload';
+
+      var request = http.MultipartRequest('POST', Uri.parse(uri));
+
+      request.fields['token'] = token;
+      request.fields['project'] = project;
+
+      request.files.add(http.MultipartFile.fromBytes('file', file,
+          filename: 'filename.' + ext));
+
+      var response = await request.send();
+      if (kDebugMode) {
+        print(response);
+      }
+
+      if (response.statusCode == 200) {
+        final res = await http.Response.fromStream(response);
+
+        if (kDebugMode) {
+          print(res.body);
+        }
+
+        return res.body;
+      } else {
+        return [];
+      }
+    } catch (e) {
+      return [];
+    }
+  }
 }
